@@ -1,14 +1,23 @@
 package compgc01.controller;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import javax.imageio.ImageIO;
+
+import compgc01.model.Film;
 import compgc01.model.Main;
 import compgc01.model.SceneCreator;
+import compgc01.service.FilmeServico;
+import compgc01.service.ImagemServico;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -30,7 +39,8 @@ import javafx.scene.layout.HBox;
  */
 public class ViewFilmsController implements Initializable {
 
-    ArrayList<File> fileList = new ArrayList<File>();
+    ArrayList<BufferedImage> fileList = new ArrayList<BufferedImage>();
+    List<Film> filmes = new ArrayList<Film>();
     HBox hb = new HBox();
     
     @FXML
@@ -46,22 +56,31 @@ public class ViewFilmsController implements Initializable {
     @FXML
     String id;
 
+    private FilmeServico filmeServico = new FilmeServico();
+    
+    private ImagemServico imagemServico = new ImagemServico();
+    
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
         try {
-            // getting folder path
-            String path = URLDecoder.decode(Main.getPath() + "res/images/filmImages/", "UTF-8");
-            // creating file object passing in the constructor the folder path
-            File folder = new File(path);
-            // pushing single path files in the array filelist1
-            for (File file : folder.listFiles()) {
-                if (!file.toString().contains("DS_Store"))
-                    fileList.add(file);
-            }
 
+			filmes = filmeServico.getAll(Main.getToken());
+			filmes.forEach(filme -> {
+				try {
+					fileList.add(imagemServico.getImagem(filme.getBanner()));
+				} catch (Exception e) {
+					String path;
+					try {
+						path = URLDecoder.decode(Main.getPath() + "res/images/backgroundImages/", "UTF-8");
+						File file = new File(path + "defaultFilmPoster.png");
+						fileList.add(ImageIO.read(file));
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+				}
+			});
+        	
             scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-
 
             // gridpane settings
             // setting exterior grid padding
@@ -94,11 +113,9 @@ public class ViewFilmsController implements Initializable {
 	 */
     private void addImage(int index, int colIndex, int rowIndex) {
 
-        String idToCut = fileList.get(index).getName();
-        String id = idToCut.substring(0, (idToCut.length() - 4));
-        // System.out.println(id);
-        // System.out.println(fileList.get(i).getName());
-        image = new Image(fileList.get(index).toURI().toString());
+        //String idToCut = fileList.get(index).getName();
+        String id = index + "";
+        image = SwingFXUtils.toFXImage(fileList.get(index), null);
         pic = new ImageView();
         pic.setFitWidth(160);
         pic.setFitHeight(220);
@@ -114,7 +131,8 @@ public class ViewFilmsController implements Initializable {
             // System.out.println("Film Title: " + id);
             try {
                 // storing the selected film to customise the newly created scene
-                Main.setSelectedFilmTitle(id);
+                Main.setSelectedFilm(filmes.get(index));
+                Main.setSelectedFilmImage(image);
                 SceneCreator.launchScene("/scenes/ViewSelectedFilmScene.fxml");
             } catch (IOException ex) {
                 ex.printStackTrace();

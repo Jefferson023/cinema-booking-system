@@ -26,7 +26,7 @@ public class AutenticacaoServico {
 
 	public User autenticar(String email, String password) throws ClientProtocolException, IOException, ParseException{
 		CloseableHttpClient client = HttpClientBuilder.create().build();
-		HttpPost httpPost = new HttpPost("https://zcinema-auth-microservice.herokuapp.com/auth");
+		HttpPost httpPost = new HttpPost("https://zcinema-api-gateway.herokuapp.com/api/auth");
 		httpPost.setHeader("Content-Type", "application/json");
 		httpPost.setHeader("Accept", "application/json");
 		JSONObject json = new JSONObject();

@@ -314,10 +314,10 @@ public class ManageBookingsController implements Initializable {
     private void populateTimeDropDownList(ActionEvent event) {
 
         try {
-            Main.setSelectedFilmTitle(filmDropDownList.getValue());
-            Film selectedFilm = Main.getFilmByTitle(Main.getSelectedFilmTitle());
+            //Main.setSelectedFilm(filmDropDownList.getValue());
+            Film selectedFilm = Main.getSelectedFilm();
 
-            ObservableList<String> timesList = FXCollections.observableArrayList(selectedFilm.getTimes());
+            ObservableList<String> timesList = FXCollections.observableArrayList(selectedFilm.getSchedules());
             for (int i = 0; i< timesList.size(); i++) {
                 if (timesList.get(i).equals("hh:mm")) {
                     timesList.remove(i);

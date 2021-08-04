@@ -1,5 +1,6 @@
 package compgc01.model;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -19,7 +20,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-
+import javafx.scene.image.Image;
 /**
  * The main class for our cinema booking management application, Cine UCL.
  * 
@@ -51,7 +52,18 @@ public class Main extends Application {
     static Main m = null;
     static User currentUser;
     static Boolean employeeMode = false, christmasSeason = false;
-    static String selectedFilmTitle = "", selectedDate = "", selectedTime = "";
+    static Film selectedFilm = null;
+    static Image selectedFilmImage = null;
+    
+    public static Image getSelectedFilmImage() {
+		return selectedFilmImage;
+	}
+
+	public static void setSelectedFilmImage(Image selectedFilmImage) {
+		Main.selectedFilmImage = selectedFilmImage;
+	}
+
+	static String selectedDate = "", selectedTime = "";
     static ArrayList<String> selectedSeats;
     
     private static String stars = "";
@@ -67,6 +79,8 @@ public class Main extends Application {
 
     static String token;
 
+    static BufferedImage imagemUsuario;
+    
     /**
      * The main method. It checks whether the designed files exist. If not, it generates them.
      * Then, the first scene is launched.
@@ -173,7 +187,7 @@ public class Main extends Application {
                     customers.add( new Customer ((String) item.get("firstName"), (String) item.get("lastName"), Encryption.decrypt((String) item.get("username")), Encryption.decrypt((String) item.get("password")), (String) item.get("email"), Double.parseDouble(String.valueOf(item.get("accountBalance")))));
                 else if (file.contains("films")) {
                     String[] times = {(String) item.get("time1"), (String) item.get("time2"), (String) item.get("time3")};
-                    films.add( new Film ((String) s, (String) item.get("description"), (String) item.get("trailer"), (String) item.get("startDate"), (String) item.get("endDate"), times));
+                    //films.add( new Film ((String) s, (String) item.get("description"), (String) item.get("trailer"), (String) item.get("startDate"), (String) item.get("endDate"), times));
                 }
                 else if (file.contains("bookings")) {
                     String customerUsername = Encryption.decrypt((String) item.get("username"));
@@ -363,14 +377,14 @@ public class Main extends Application {
         return null;
     }
 
-    public static void setSelectedFilmTitle(String selectedFilmTitle) {
+    public static void setSelectedFilm(Film selectedFilm) {
 
-        Main.selectedFilmTitle = selectedFilmTitle;
+        Main.selectedFilm = selectedFilm;
     }
 
-    public static String getSelectedFilmTitle() {
+    public static Film getSelectedFilm() {
 
-        return selectedFilmTitle;
+        return selectedFilm;
     }
 
     public static void setSelectedDate(String selectedDate) {
@@ -445,6 +459,14 @@ public class Main extends Application {
         }
     }
 
+    public static void setImagemUsuario(BufferedImage imagem) {
+    	imagemUsuario = imagem;
+    }
+    
+    public static BufferedImage getImagemUsuario() {
+    	return imagemUsuario;
+    }
+    
 	public static String getStars() {
 		return stars;
 	}

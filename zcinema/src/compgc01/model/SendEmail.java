@@ -46,7 +46,7 @@ public class SendEmail {
             if (type.equals("reminder")) {
             message.setSubject("Booking Confirmation");
             message.setText("Dear " + Main.getCurrentUser().getFirstName() + ",\n\n" +
-                    "Your booking for the film " + Main.getSelectedFilmTitle() + " has been confirmed. Please, keep this email as proof of your booking.\n\nLooking forward to seeing you on " + Main.getSelectedDate() +
+                    "Your booking for the film " + Main.getSelectedFilm() + " has been confirmed. Please, keep this email as proof of your booking.\n\nLooking forward to seeing you on " + Main.getSelectedDate() +
                     ", at " + Main.getSelectedTime() + "!\n\nStay Awesome!,\nCine UCL");
             }
             else {

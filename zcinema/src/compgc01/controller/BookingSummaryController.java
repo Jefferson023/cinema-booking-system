@@ -34,7 +34,7 @@ public class BookingSummaryController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
 
         nameSummary.setText((Main.getCurrentUser().getFullName()));		
-        filmSummary.setText(Main.getSelectedFilmTitle());
+        filmSummary.setText(Main.getSelectedFilm().getTitle());
         dateSummary.setText(Main.getSelectedDate());
         timeSummary.setText(Main.getSelectedTime());
         for (int i = 0; i < Main.getSelectedSeats().size(); i++) {
