@@ -70,8 +70,8 @@ public class UserSceneController {
 		stopPlayer.setImage(img2);
 
 		musicPlaying = false;
-		file = new File(URLDecoder.decode(Main.getPath() + "res/sounds/canonInDMajor.mp3", "UTF-8"));
-		Media backgroundMusic = new Media(file.toPath().toUri().toString());
+		File file3 = new File(URLDecoder.decode(Main.getPath() + "res/sounds/canonInDMajor.mp3", "UTF-8"));
+		Media backgroundMusic = new Media(file3.toPath().toUri().toString());
 		player = new MediaPlayer(backgroundMusic);
 	}
 
@@ -165,13 +165,17 @@ public class UserSceneController {
 			exportFilmList.setVisible(false);
 		}
 
-		// Todo: pegar a imagem pelo microserviço
 		// String path = URLDecoder.decode(Main.getPath() + "res/images/userImages/",
 		// "UTF-8");
-		String path = URLDecoder.decode(Main.getPath() + "res/images/userImages/", "UTF-8");
-		File file = new File(path + "defaultUserIcon" + ".png");
-		Image img = SwingFXUtils.toFXImage(ImageIO.read(file), null);
-		uploadedUserIcon.setImage(img);
+		try {
+			Image img = SwingFXUtils.toFXImage(Main.getImagemUsuario(), null);
+			uploadedUserIcon.setImage(img);
+		}catch (Exception e) {
+			String path = URLDecoder.decode(Main.getPath() + "res/images/userImages/", "UTF-8");
+			File file = new File(path + "defaultUserIcon" + ".png");
+			Image img = SwingFXUtils.toFXImage(ImageIO.read(file), null);
+			uploadedUserIcon.setImage(img);	
+		}
 	}
 
 	@FXML

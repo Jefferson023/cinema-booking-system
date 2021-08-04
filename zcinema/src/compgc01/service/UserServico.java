@@ -20,7 +20,7 @@ public class UserServico {
 
 	public void atualizarInformacoes(User usuario, String token) throws ClientProtocolException, IOException {
 		CloseableHttpClient client = HttpClientBuilder.create().build();
-		HttpPatch httpPatch = new HttpPatch("https://zcinema-server-test.herokuapp.com/users/" + usuario.getId());
+		HttpPatch httpPatch = new HttpPatch("https://zcinema-api-gateway.herokuapp.com/api/users/" + usuario.getId());
 		httpPatch.setHeader("Content-Type", "application/json");
 		httpPatch.setHeader("Accept", "application/json");
 		httpPatch.setHeader("Authorization", "Bearer "+token);

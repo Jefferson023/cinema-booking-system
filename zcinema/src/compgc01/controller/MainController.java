@@ -10,6 +10,7 @@ import compgc01.model.Main;
 import compgc01.model.SceneCreator;
 import compgc01.model.User;
 import compgc01.service.AutenticacaoServico;
+import compgc01.service.ImagemServico;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -54,6 +55,11 @@ public class MainController {
         try {
 			User user = autenticacaoServico.autenticar(usernameBox.getText(), 
 					passwordBox.getText());
+			try {
+				Main.setImagemUsuario(ImagemServico.getImagem(user.getAvatar()));
+			} catch (IOException e) {
+				Main.setImagemUsuario(null);
+			}
 			Main.setCurrentUser(user);
 			Main.setToken(autenticacaoServico.getToken());
 			SceneCreator.launchScene("/scenes/UserScene.fxml");

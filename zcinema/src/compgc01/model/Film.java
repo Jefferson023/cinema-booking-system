@@ -1,25 +1,35 @@
 package compgc01.model;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.json.simple.JSONObject;
+
 /**
  * A class represeting a film.
  * @author Team 3: Filippos Zofakis and Lucio D'Alessandro
  * @since 11.12.2017
  */
 public class Film {
-
+	private Long id;
     private String title = "Default Title", description = "Default Description", trailer = "Default Trailer",
             startDate = "yyyy-mm-dd", endDate = "yyyy-mm-dd";
-    private String[] times = {"hh:mm", "hh:mm", "hh:mm"};
+    private List<String> schedules = Arrays.asList("hh:mm", "hh:mm", "hh:mm");
+    private String banner;
 
-    Film(String title, String description, String trailer, String startDate, String endDate, String[] times) {
+    public Film(Long id, String title, String description, String trailer, String startDate, 
+    		String endDate, List<String> times, String banner) {
 
-        if (!title.isEmpty() && !description.isEmpty() && !trailer.isEmpty() && !startDate.isEmpty() && !endDate.isEmpty() && !(times.length == 0))
+        if (!title.isEmpty() && !description.isEmpty() && !trailer.isEmpty() && !startDate.isEmpty() && !endDate.isEmpty() && !(times.size() == 0))
             this.title = title;
         this.description = description;
         this.trailer = trailer;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.times = times;
+        this.schedules = times;
+        this.banner = banner;
+        this.id = id;
     }
 
     public String getTitle() {
@@ -77,14 +87,42 @@ public class Film {
             this.endDate = endDate;
     }
 
-    public String[] getTimes() {
+    public List<String> getSchedules() {
 
-        return times;
+        return schedules;
     }
 
-    void setTimes(String[] times) {
+    void setSchedules(List<String> times) {
 
-        if (!(times.length == 0))
-            this.times = times;
+        if (!(times.size() == 0))
+            this.schedules = times;
     }
+
+	/**
+	 * @return the banner
+	 */
+	public String getBanner() {
+		return banner;
+	}
+
+	/**
+	 * @param banner the banner to set
+	 */
+	public void setBanner(String banner) {
+		this.banner = banner;
+	}
+
+	/**
+	 * @return the id
+	 */
+	public Long getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
 }

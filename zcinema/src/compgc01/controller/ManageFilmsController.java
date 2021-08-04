@@ -11,7 +11,9 @@ import java.nio.file.StandardCopyOption;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,6 +24,7 @@ import org.json.simple.JSONObject;
 import compgc01.model.Film;
 import compgc01.model.Main;
 import compgc01.model.SceneCreator;
+import compgc01.service.FilmeServico;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
@@ -68,10 +71,12 @@ public class ManageFilmsController {
 	@FXML
 	ImageView uploadedFilmPoster;
 
+	FilmeServico filmeServico = new FilmeServico();
+	
 	@FXML
 	void initialize() throws IOException {
 		
-		filmTrailer.setPromptText("Enter trailer link here... (Optional)");
+		filmTrailer.setPromptText("Enter trailer link here...");
 
 		ObservableList<String> obsList = FXCollections.observableArrayList("13:00", "14:00", "15:00", "16:00", "17:00",
 				"18:00", "19:00", "20:00", "21:00", "22:00", "23:00", "00:00", "01:00", "02:00", "03:00");
@@ -203,44 +208,25 @@ public class ManageFilmsController {
 		try {
 			validateFilmInput();
 
-			// creating JSON objects
-			JSONObject films = Main.readJSONFile("filmsJSON.txt");
-			JSONObject filmToAdd = new JSONObject();
-			filmToAdd.put("description", filmDescription.getText());
-			filmToAdd.put("trailer", filmTrailer.getText());
-			filmToAdd.put("startDate", newFilmStartDate.getText());
-			filmToAdd.put("endDate", newFilmEndDate.getText());
-			filmToAdd.put("time1", newFilmTime1.getText());
-			filmToAdd.put("time2", newFilmTime2.getText());
-			filmToAdd.put("time3", newFilmTime3.getText());
-			films.put(filmTitle.getText(), filmToAdd);
-			// System.out.println(films.toJSONString());
-
-			// storing film in JSON file
-			String path = URLDecoder.decode(Main.getPath() + "res/filmsJSON.txt", "UTF-8");
-			// System.out.println(path);
-			PrintWriter writer = new PrintWriter(new File(path));
-			writer.print(films.toJSONString());
-			writer.close();
-
-			// storing film poster in film images folder
-			String folderPath = URLDecoder.decode(Main.getPath() + "res/images/filmImages/", "UTF-8");
-			File uploads = new File(folderPath);
-			File file = new File(uploads, filmTitle.getText() + ".png");
-			InputStream input = Files.newInputStream(selectedImage.toPath());
-			Files.copy(input, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-			// confirmation alert to inform the employee of the newly added film
 			Alert alert = new Alert(AlertType.INFORMATION, "The film " + filmTitle.getText() + " has been added!",
 					ButtonType.OK);
 			alert.showAndWait();
 
-			// reloading film list to include the recently added film, and
-			// restoring all fields to empty
-			// and closing alert on click
 			if (alert.getResult() == ButtonType.OK) {
 				Main.resetFilmList();
-				Main.readJSONFile("filmsJSON.txt");
-				filmDescription.setText("");
+				List<String> schedules = new ArrayList<String>();
+				if (!newFilmTime1.getText().equals("hh:mm")) {
+					schedules.add(newFilmTime1.getText());
+				}
+				if (!newFilmTime2.getText().equals("hh:mm")) {
+					schedules.add(newFilmTime2.getText());
+				}
+				if (!newFilmTime3.getText().equals("hh:mm")) {
+					schedules.add(newFilmTime3.getText());
+				}
+				filmeServico.cadastrar(filmTitle.getText(), filmDescription.getText(), filmTrailer.getText(),
+						newFilmStartDate.getText(), newFilmEndDate.getText(), schedules, 
+						Files.readAllBytes(selectedImage.toPath()), Main.getToken());
 				filmDescription.setText("");
 				filmTitle.setText("");
 				filmStartDate.setPromptText("yyyy-mm-dd");
@@ -295,40 +281,6 @@ public class ManageFilmsController {
 				throw new InvalidFilmInputException("Screenings cannot start and end on the same day!");
 			else if (filmStartDate.getValue().compareTo(filmEndDate.getValue()) > 0)
 				throw new InvalidFilmInputException("End date cannot be before start date!");
-
-			// checking that the title of the movie is unique
-			for (Film c : Main.getFilmList()) {
-				if (c.getTitle().equals(filmTitle.getText()))
-					throw new InvalidFilmInputException(
-							"The title " + filmTitle.getText() + " belongs to another scheduled movie!");
-			}
-
-			// looping through the films to find date and time conflicts
-			for (Film c : Main.getFilmList()) {
-
-				// converting movie start and end dates to LocalDate for
-				// comparison
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-				LocalDate startDateFilms = LocalDate.parse(c.getStartDate(), formatter);
-				LocalDate endDateFilms = LocalDate.parse(c.getEndDate(), formatter);
-
-				// if the dates overlap...
-				if (!(filmStartDate.getValue().compareTo(endDateFilms) > 0
-						|| filmEndDate.getValue().compareTo(startDateFilms) < 0)) {
-
-					// System.out.println("startDate loop: " + startDateFilms);
-					// System.out.println("endDate loop: " + endDateFilms);
-
-					// ... and the time(s) overlap as well
-					String[] times = c.getTimes();
-					if (Arrays.asList(times).contains(filmTime1.getValue())
-							|| Arrays.asList(times).contains(filmTime2.getValue())
-							|| Arrays.asList(times).contains(filmTime3.getValue())) {
-						throw new InvalidFilmInputException("The screening time(s) of your film: " + filmTitle.getText()
-								+ " overlap(s) with the film: " + c.getTitle().toString() + "!");
-					}
-				}
-			}
 		} catch (NullPointerException e) {
 			throw new InvalidFilmInputException("Please complete all fields!");
 		}
