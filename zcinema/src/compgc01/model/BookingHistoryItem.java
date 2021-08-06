@@ -9,64 +9,115 @@ import javafx.beans.property.SimpleStringProperty;
  */
 public class BookingHistoryItem {
 
-    private final SimpleStringProperty status, firstName, lastName, film, date, time, seat, idNumber;
+    private String status, firstName, lastName, film, date, time, seat, idNumber;
     private String username;
+    private Long sessionId;
+    public BookingHistoryItem (String status, String username, String firstName, String lastName, String film, String date, String time, String price, String idNumber, Long sessionId) {
 
-    public BookingHistoryItem (String status, String username, String firstName, String lastName, String film, String date, String time, String price, String idNumber) {
-
-        this.status = new SimpleStringProperty(status);
-        this.firstName = new SimpleStringProperty(firstName);
-        this.lastName = new SimpleStringProperty(lastName);
-        this.film = new SimpleStringProperty(film);
-        this.date = new SimpleStringProperty(date);
-        this.time = new SimpleStringProperty(time);
-        this.seat = new SimpleStringProperty(price);
-        this.idNumber = new SimpleStringProperty(idNumber);
+        this.status = status;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.film = film;
+        this.date = date;
+        this.time = time;
+        this.seat = price;
+        this.idNumber = idNumber;
         this.username = username;
+        this.sessionId = sessionId;
     }
 
-    public String getStatus() {
+    public void setStatus(String status) {
+		this.status = status;
+	}
 
-        return status.get();
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public void setFilm(String film) {
+		this.film = film;
+	}
+
+	public void setDate(String date) {
+		this.date = date;
+	}
+
+	public void setTime(String time) {
+		this.time = time;
+	}
+
+	public void setSeat(String seat) {
+		this.seat = seat;
+	}
+
+	public void setIdNumber(String idNumber) {
+		this.idNumber = idNumber;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getStatus() {
+
+        return status;
     }
 
     public String getFirstName() {
 
-        return firstName.get();
+        return firstName;
     }
 
     public String getLastName() {
 
-        return lastName.get();
+        return lastName;
     }
 
     public String getFilm() {
 
-        return film.get();
+        return film;
     }
 
     public String getDate() {
 
-        return date.get();
+        return date;
     }
 
     public String getTime() {
 
-        return time.get();
+        return time;
     }
 
     public String getSeat() {
 
-        return seat.get();
+        return seat;
     }
 
     public String getIdNumber() {
 
-        return idNumber.get();
+        return idNumber;
     }
 
     public String getUsername() {
 
         return username;
     }
+
+	/**
+	 * @return the sessionId
+	 */
+	public Long getSessionId() {
+		return sessionId;
+	}
+
+	/**
+	 * @param sessionId the sessionId to set
+	 */
+	public void setSessionId(Long sessionId) {
+		this.sessionId = sessionId;
+	}
 }

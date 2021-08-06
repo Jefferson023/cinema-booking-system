@@ -210,23 +210,27 @@ public class ManageFilmsController {
 
 			Alert alert = new Alert(AlertType.INFORMATION, "The film " + filmTitle.getText() + " has been added!",
 					ButtonType.OK);
+			
 			alert.showAndWait();
-
+			
+			List<String> schedules = new ArrayList<String>();
+			
+			if (!newFilmTime1.getText().equals("hh:mm")) {
+				schedules.add(newFilmTime1.getText());
+			}
+			if (!newFilmTime2.getText().equals("hh:mm")) {
+				schedules.add(newFilmTime2.getText());
+			}
+			if (!newFilmTime3.getText().equals("hh:mm")) {
+				schedules.add(newFilmTime3.getText());
+			}
+			
+			filmeServico.cadastrar(filmTitle.getText(), filmDescription.getText(), filmTrailer.getText(),
+					newFilmStartDate.getText(), newFilmEndDate.getText(), schedules, 
+					Files.readAllBytes(selectedImage.toPath()), Main.getToken());
+			
 			if (alert.getResult() == ButtonType.OK) {
-				Main.resetFilmList();
-				List<String> schedules = new ArrayList<String>();
-				if (!newFilmTime1.getText().equals("hh:mm")) {
-					schedules.add(newFilmTime1.getText());
-				}
-				if (!newFilmTime2.getText().equals("hh:mm")) {
-					schedules.add(newFilmTime2.getText());
-				}
-				if (!newFilmTime3.getText().equals("hh:mm")) {
-					schedules.add(newFilmTime3.getText());
-				}
-				filmeServico.cadastrar(filmTitle.getText(), filmDescription.getText(), filmTrailer.getText(),
-						newFilmStartDate.getText(), newFilmEndDate.getText(), schedules, 
-						Files.readAllBytes(selectedImage.toPath()), Main.getToken());
+				//Main.resetFilmList();
 				filmDescription.setText("");
 				filmTitle.setText("");
 				filmStartDate.setPromptText("yyyy-mm-dd");

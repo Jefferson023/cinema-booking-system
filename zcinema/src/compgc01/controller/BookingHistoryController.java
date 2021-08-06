@@ -5,12 +5,23 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 
 import compgc01.model.BookingHistoryItem;
+import compgc01.model.Film;
 import compgc01.model.Main;
 import compgc01.model.SceneCreator;
+import compgc01.model.Sessao;
+import compgc01.model.User;
+import compgc01.service.FilmeServico;
+import compgc01.service.ReservasServico;
+import compgc01.service.UserServico;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -51,25 +62,59 @@ public class BookingHistoryController implements Initializable {
     @FXML
     JSONObject user;
 
+    private ReservasServico reservaServico = new ReservasServico();
+    private FilmeServico filmeServico = new FilmeServico();
+    private UserServico userServico = new UserServico();
+    
+    private List<BookingHistoryItem> reservas;
+    private List<User> usuarios;
+    private List<Film> filmes;
+    private List<Sessao> sessoes;
+    private Set<Long> sessoesIds;
     // method that gets executed at load time
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
         setTableColumns();
         Main.resetBookingList();
-        Main.readJSONFile("bookingsJSON.txt");
+        try {
+			reservas = reservaServico.getAllReservas(Main.getToken());
+			if (!Main.isEmployee()) {
+				reservas = reservas.stream().filter(r -> 
+				r.getUsername().equals(Main.getCurrentUser().getId().toString())).collect(Collectors.toList());
+				reservas.forEach(reserva -> {
+					reserva.setFirstName(Main.getCurrentUser().getFirstName());
+					reserva.setLastName(Main.getCurrentUser().getLastName());
+				});
+			}else {
+				usuarios = userServico.getAll(Main.getToken());
+				reservas.forEach(reserva -> {
+					User usuario = usuarios.stream().filter(u -> 
+					u.getId().toString().equals(reserva.getUsername())).findAny().get();
+					
+					reserva.setFirstName(usuario.getFirstName());
+					reserva.setLastName(usuario.getLastName());
+				});
+			}
+//			reservas.forEach(reserva -> {
+//				if (sessoesIds.contains(reserva.getFilm())){
+//					Sessao sessao = sessoes.stream()
+//							.filter(s -> s.getId().toString()
+//									.equals(reserva.getFilm())).findAny().get();
+//					reserva.setFilm(sessao.getMovieTitle());
+//					reserva.setTime(sessao.getSchedule());
+//				}else {
+//					//TODO
+//				}
+//			});
+
+		} catch (ParseException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         
         // storing elements in the observable list
-        if (Main.isEmployee())
-            populateTableList = FXCollections.observableArrayList(Main.getBookingList());
-        else {
-            ArrayList<BookingHistoryItem> currentCustomerBookings = new ArrayList<BookingHistoryItem>();
-            for (BookingHistoryItem booking : Main.getBookingList()) {
-                if (booking.getUsername().equals(Main.getCurrentUser().getUsername()))
-                    currentCustomerBookings.add(booking);
-            }
-            populateTableList = FXCollections.observableArrayList(currentCustomerBookings);
-        }
+        populateTableList = FXCollections.observableArrayList(reservas);
 
         // populating the table with the elements stored in observable list
         table.getItems().addAll(populateTableList);
@@ -138,7 +183,7 @@ public class BookingHistoryController implements Initializable {
                         // we get here all the info of the booking of this row
                         BookingHistoryItem bookingInfo = getTableView().getItems().get(getIndex());
                         // style all rows whose status is set to "cancelled"
-                        if (bookingInfo.getStatus().equals("cancelled")) {
+                        if (bookingInfo.getStatus().equals("CANCELED")) {
                             // set the background colour of the row to gray
                             setStyle("-fx-background-color: #D3D3D3");
                         } else {
@@ -186,9 +231,13 @@ public class BookingHistoryController implements Initializable {
         // if the user clicks OK
         if (alert.getResult() == ButtonType.YES) {
             if (isSelectedRowValid(selectedRowId)) {
-                if (table.getSelectionModel().getSelectedItem().getStatus().equals("booked")) {
+                if (!table.getSelectionModel().getSelectedItem().getStatus().equals("CANCELED")) {
                     if (validateBookingCancellation()) { // comparing booking's date with the current date
-                        Main.modifyJSONFile("bookingsJSON.txt", selectedRowId, "status", "cancelled");
+                        //Main.modifyJSONFile("bookingsJSON.txt", selectedRowId, "status", "cancelled");
+                    	@SuppressWarnings("restriction")
+						BookingHistoryItem reserva = table.getSelectionModel().getSelectedItem();
+                    	reservaServico.cancelarReserva(Long.parseLong(reserva.getUsername()),
+                    			reserva.getSessionId());
                         Main.resetBookingList();
                         SceneCreator.launchScene("/scenes/BookingHistoryScene.fxml");
                         alert.close();

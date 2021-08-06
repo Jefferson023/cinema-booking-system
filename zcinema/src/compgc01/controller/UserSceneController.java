@@ -246,8 +246,6 @@ public class UserSceneController {
 		// reading the films and bookings from the JSON file to ensure we are working
 		// with the most recent version
 		// and there is no duplication
-		Main.readJSONFile("filmsJSON.txt");
-		Main.readJSONFile("bookingsJSON.txt");
 
 		DirectoryChooser folderChooser = new DirectoryChooser();
 		folderChooser.setTitle("Select folder:");
