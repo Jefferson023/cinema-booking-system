@@ -69,6 +69,40 @@ public class FilmeServico {
 	}
 	
 	@SuppressWarnings("unchecked")
+	public Film getById(String token, Long Id) throws IOException, ParseException {
+		CloseableHttpClient client = HttpClientBuilder.create().build();
+		HttpGet httpGet = new HttpGet("https://zcinema-api-gateway.herokuapp.com/api/movies/"+Id);
+		httpGet.setHeader("Content-Type", "application/json");
+		httpGet.setHeader("Accept", "application/json");
+		httpGet.setHeader("Authorization", "Bearer " + token);
+
+		CloseableHttpResponse response = client.execute(httpGet);
+
+		if (response.getStatusLine().getStatusCode() != 200) {
+			throw new IOException();
+		}
+
+		String responseBody = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
+
+		JSONParser parser = new JSONParser();
+		JSONObject jsonRes = (JSONObject) parser.parse(responseBody);
+		JSONArray filmesJson = (JSONArray) jsonRes.get("movies");
+
+		JSONObject filmJson = (JSONObject) filmesJson.get(0);
+		Long id = (Long) filmJson.get("id");
+		String title = (String) filmJson.get("title");
+		String description = (String) filmJson.get("description");
+		String trailer = (String) filmJson.get("trailer");
+		String startDate = (String) filmJson.get("start_date");
+		String endDate = (String) filmJson.get("end_date");
+		List<String> times = new ArrayList<String>();
+		((JSONArray) filmJson.get("schedules")).forEach(horario -> times.add((String) horario));
+		String banner = (String) filmJson.get("banner");
+		return new Film(id, title, description, trailer, startDate, 
+	    		endDate, times, banner);
+	}
+	
+	@SuppressWarnings("unchecked")
 	public void cadastrar(String title, 
 		      String description, 
 		      String trailer,

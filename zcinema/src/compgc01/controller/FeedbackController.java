@@ -91,7 +91,6 @@ public class FeedbackController implements Initializable {
     private void populateFilmDropDownList(ActionEvent event) throws ParseException {
 
         Main.resetFilmList();
-        Main.readJSONFile("filmsJSON.txt");
 
         try {
 
