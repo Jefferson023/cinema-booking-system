@@ -70,7 +70,7 @@ public class BookingHistoryController implements Initializable {
     private List<User> usuarios;
     private List<Film> filmes;
     private List<Sessao> sessoes;
-    private Set<Long> sessoesIds;
+
     // method that gets executed at load time
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -79,6 +79,7 @@ public class BookingHistoryController implements Initializable {
         Main.resetBookingList();
         try {
 			reservas = reservaServico.getAllReservas(Main.getToken());
+			sessoes = reservaServico.getAllSessao(Main.getToken());
 			if (!Main.isEmployee()) {
 				reservas = reservas.stream().filter(r -> 
 				r.getUsername().equals(Main.getCurrentUser().getId().toString())).collect(Collectors.toList());
@@ -96,17 +97,13 @@ public class BookingHistoryController implements Initializable {
 					reserva.setLastName(usuario.getLastName());
 				});
 			}
-//			reservas.forEach(reserva -> {
-//				if (sessoesIds.contains(reserva.getFilm())){
-//					Sessao sessao = sessoes.stream()
-//							.filter(s -> s.getId().toString()
-//									.equals(reserva.getFilm())).findAny().get();
-//					reserva.setFilm(sessao.getMovieTitle());
-//					reserva.setTime(sessao.getSchedule());
-//				}else {
-//					//TODO
-//				}
-//			});
+			reservas.forEach(reserva -> {
+				Sessao sessao = sessoes.stream()
+				.filter(s -> s.getId().toString().equals(reserva.getSessionId().toString()))
+				.findAny().get();
+				reserva.setFilm(sessao.getMovieTitle());
+				reserva.setTime(sessao.getSchedule());
+			});
 
 		} catch (ParseException | IOException e) {
 			// TODO Auto-generated catch block
